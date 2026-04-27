@@ -1,0 +1,78 @@
+name: Pipeline Web Angular
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-test-sonar-push:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Baixa o código para a máquina do GitHub
+    - name: Checkout do código
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    # 2. Prepara o ambiente Node.js na versão 20
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    # 3. Instala as dependências do package.json
+    - name: Instalar Dependências
+      run: npm install
+
+    # 4. Roda os testes do Angular em modo invisível (Headless)
+    - name: Rodar Testes
+      run: npm run test -- --watch=false --browsers=ChromeHeadless
+
+    # 5. Análise de Qualidade do Código no SonarCloud
+    - name: SonarCloud Scan
+      uses: SonarSource/sonarcloud-github-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      with:
+        args: >
+          -Dsonar.projectKey=turisco-tech_poc-agenda-web
+          -Dsonar.organization=turisco-tech
+          -Dsonar.sources=src
+          -Dsonar.tests=src
+          -Dsonar.test.inclusions=**/*.spec.ts
+          -Dsonar.exclusions=**/node_modules/**,**/*.spec.ts
+
+    # 6. Autenticação na AWS
+    - name: Configurar Credenciais AWS
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    # 7. Login no cofre (ECR)
+    - name: Login no Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    # 8. Multi-stage Docker Build e Push
+    - name: Build, Tag, e Push da Imagem Docker
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: poc-agenda-web
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+    # 9. Coleta de logs críticos em caso de falha
+    - name: Tratamento de Erros e Logs Críticos
+      if: failure()
+      run: |
+        echo "::error::Falha detectada na esteira do Web! Coletando logs..."
+        docker system df
+        docker ps -a
