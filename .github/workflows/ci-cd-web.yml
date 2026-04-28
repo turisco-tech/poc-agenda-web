@@ -76,3 +76,21 @@ jobs:
         echo "::error::Falha detectada na esteira do Web! Coletando logs..."
         docker system df
         docker ps -a
+
+      # NOVO PASSO 1: Injeta a nova imagem Docker no JSON do Frontend
+    - name: Preencher o novo ID da imagem na Task Definition
+      id: render-task-def
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: .aws/task-definition.json
+        container-name: web-container
+        image: ${{ steps.login-ecr.outputs.registry }}/poc-agenda-web:${{ github.sha }}
+
+    # NOVO PASSO 2: Atualiza o Serviço ECS na AWS
+    - name: Deploy da nova Task Definition Web no Amazon ECS
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.render-task-def.outputs.task-definition }}
+        service: poc-agenda-web-service
+        cluster: poc-agenda-cluster
+        wait-for-service-stability: true
