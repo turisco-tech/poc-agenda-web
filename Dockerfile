@@ -13,6 +13,10 @@ FROM nginx:alpine
 # Copia APENAS os arquivos prontos do estágio anterior para a pasta do Nginx
 # Atenção: Dependendo da versão do Angular (17+), a pasta final pode ter um "/browser" no final.
 COPY --from=build /app/dist/poc-agenda-web/browser /usr/share/nginx/html
+
+# Copia a nossa configuração customizada para dentro do container
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 # Expõe a porta padrão do servidor web
 EXPOSE 80
 # Inicia o Nginx
