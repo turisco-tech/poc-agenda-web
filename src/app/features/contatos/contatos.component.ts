@@ -30,7 +30,7 @@ export class ContatosComponent implements OnInit {
   contatos: Contato[] = [];
   contatoSelecionado: Contato = { nome: '', email: '' };
 
-  constructor(private service: ContatoService) {}
+  constructor(private service: ContatoService) { }
 
   ngOnInit() {
     this.carregarContatos();
@@ -41,10 +41,18 @@ export class ContatosComponent implements OnInit {
   }
 
   salvar(contato: Contato) {
+    console.log('Dados recebidos do form:', contato); // Nossa lupa!
+
     if (contato.id) {
-      this.service.atualizar(contato.id, contato).subscribe(() => this.carregarContatos());
+      this.service.atualizar(contato.id, contato).subscribe({
+        next: () => this.carregarContatos(),
+        error: (err) => console.error('Erro no PUT:', err)
+      });
     } else {
-      this.service.criar(contato).subscribe(() => this.carregarContatos());
+      this.service.criar(contato).subscribe({
+        next: () => this.carregarContatos(),
+        error: (err) => console.error('Erro no POST:', err)
+      });
     }
     this.limpar();
   }
