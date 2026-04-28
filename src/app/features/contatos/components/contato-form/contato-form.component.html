@@ -1,0 +1,6 @@
+<form (ngSubmit)="salvar.emit(contato)">
+  <input [(ngModel)]="contato.nome" name="nome" placeholder="Nome" required>
+  <input [(ngModel)]="contato.email" name="email" placeholder="E-mail" required>
+  <button type="submit">Salvar</button>
+  <button type="button" (click)="cancelar.emit()">Cancelar</button>
+</form>

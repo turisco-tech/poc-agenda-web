@@ -1,0 +1,19 @@
+<table class="table">
+  <thead>
+    <tr>
+      <th>Nome</th>
+      <th>E-mail</th>
+      <th>Ações</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let contato of contatos">
+      <td>{{ contato.nome }}</td>
+      <td>{{ contato.email }}</td>
+      <td>
+        <button (click)="editar.emit(contato)" class="btn-edit">Editar</button>
+        <button (click)="deletar.emit(contato.id!)" class="btn-delete">Excluir</button>
+      </td>
+    </tr>
+  </tbody>
+</table>

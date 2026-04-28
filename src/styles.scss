@@ -1,1 +1,139 @@
 /* You can add global styles to this file, and also import other style files */
+/* =========================================
+   VARIÁVEIS GLOBAIS (O Tema da Aplicação)
+   ========================================= */
+:root {
+  --primary-color: #2563eb; /* Azul corporativo */
+  --primary-hover: #1d4ed8;
+  --danger-color: #dc2626;  /* Vermelho alerta */
+  --danger-hover: #b91c1c;
+  --bg-color: #f1f5f9;      /* Fundo cinza claro super moderno */
+  --card-bg: #ffffff;
+  --text-main: #1e293b;
+  --border-color: #e2e8f0;
+}
+
+/* =========================================
+   RESET E BASE
+   ========================================= */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+/* =========================================
+   O CONTAINER PRINCIPAL (A "Folha de Papel")
+   ========================================= */
+.container {
+  background-color: var(--card-bg);
+  width: 100%;
+  max-width: 800px;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+h1 {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  color: var(--primary-color);
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 0.5rem;
+}
+
+/* =========================================
+   FORMULÁRIOS E INPUTS
+   ========================================= */
+form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+input {
+  flex: 1;
+  min-width: 200px;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.3s;
+
+  &:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+  }
+}
+
+/* =========================================
+   BOTÕES GLOBAIS
+   ========================================= */
+button {
+  padding: 0.75rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: var(--primary-color);
+  color: white;
+
+  &:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-1px);
+  }
+}
+
+button[type="button"], .btn-edit {
+  background-color: #64748b; /* Botão neutro */
+  &:hover { background-color: #475569; }
+}
+
+.btn-delete {
+  background-color: var(--danger-color);
+  &:hover { background-color: var(--danger-hover); }
+}
+
+/* =========================================
+   TABELA DE DADOS
+   ========================================= */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+
+  th {
+    text-align: left;
+    background-color: #f8fafc;
+    padding: 1rem;
+    border-bottom: 2px solid var(--border-color);
+    color: #475569;
+  }
+
+  td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+  }
+
+  tr:hover td {
+    background-color: #f8fafc; /* Efeito de hover na linha inteira */
+  }
+
+  td:last-child {
+    display: flex;
+    gap: 8px; /* Espaço entre os botões de ação */
+  }
+}
