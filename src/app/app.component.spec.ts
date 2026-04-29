@@ -1,14 +1,17 @@
 import { TestBed } from '@angular/core/testing';
 import { AppComponent } from './app.component';
 import { provideHttpClient } from '@angular/common/http';
+import { provideRouter } from '@angular/router'; // <-- Importação necessária
 
 describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AppComponent],
-      // Como o nosso app carrega o ContatosComponent (que usa o ContatoService),
-      // precisamos injetar o provedor de rotas HTTP no ambiente de testes também!
-      providers: [provideHttpClient()] 
+      providers: [
+        provideHttpClient(),
+        // Precisamos fornecer um roteador vazio para que o router-outlet e routerLink funcionem no teste
+        provideRouter([]) 
+      ]
     }).compileComponents();
   });
 
@@ -18,5 +21,5 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  // Removemos os testes antigos do 'title' pois eles não fazem mais parte do nosso escopo.
+  // Testes de título removidos conforme solicitado, mantendo o foco na criação do componente.
 });
