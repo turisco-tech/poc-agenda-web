@@ -9,7 +9,7 @@ import { Contato } from '../models/contato.model';
 export class ContatoService {
   
   // URL da API. Se for testar contra a nuvem, troque o localhost pelo IP da AWS
-  private apiUrl = 'http://3.239.105.158:8080/api/contatos'; 
+  private apiUrl = 'http://44.205.251.58:8080/api/contatos'; 
 
   constructor(private http: HttpClient) {}
 
