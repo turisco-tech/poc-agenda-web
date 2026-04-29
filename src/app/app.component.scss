@@ -1,0 +1,38 @@
+.main-nav {
+  background: #2c3e50;
+  padding: 1rem;
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+
+  a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 8px 16px;
+    border-radius: 4px;
+    transition: background 0.3s;
+
+    &:hover, &.active {
+      background: #34495e;
+    }
+  }
+}
+
+.content-area {
+  padding: 2rem;
+}
+
+/* Adicione no final do seu app.component.scss */
+@media (max-width: 600px) {
+  .main-nav {
+    flex-direction: column; /* Empilha os botões no celular */
+    align-items: stretch;   /* Faz os botões ocuparem 100% da largura */
+    padding: 1rem;
+    gap: 10px;
+  }
+  
+  .main-nav a {
+    text-align: center;
+  }
+}

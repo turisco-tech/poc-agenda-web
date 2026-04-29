@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { Contato } from '../models/contato.model';
 
 @Injectable({
@@ -9,7 +10,13 @@ import { Contato } from '../models/contato.model';
 export class ContatoService {
   
   // URL da API. Se for testar contra a nuvem, troque o localhost pelo IP da AWS
-  private apiUrl = 'http://44.205.251.58:8080/api/contatos'; 
+  private apiUrl = 'http://localhost:8080/api/contatos'; 
+
+  // 1. Criamos o "rádio comunicador" invisível
+  private contatoModificadoSource = new Subject<void>();
+  
+  // 2. Expomos o rádio para os componentes ouvirem
+  contatoModificado$ = this.contatoModificadoSource.asObservable();
 
   constructor(private http: HttpClient) {}
 
@@ -18,14 +25,23 @@ export class ContatoService {
   }
 
   criar(contato: Contato): Observable<Contato> {
-    return this.http.post<Contato>(this.apiUrl, contato);
+    return this.http.post<Contato>(this.apiUrl, contato).pipe(
+      // Avisa no rádio que um contato foi criado
+      tap(() => this.contatoModificadoSource.next()) 
+    );
   }
 
   atualizar(id: string, contato: Contato): Observable<Contato> {
-    return this.http.put<Contato>(`${this.apiUrl}/${id}`, contato);
+    return this.http.put<Contato>(`${this.apiUrl}/${id}`, contato).pipe(
+      // Avisa no rádio que um contato foi atualizado
+      tap(() => this.contatoModificadoSource.next())
+    );
   }
 
   deletar(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+    return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
+      // Avisa no rádio que um contato foi deletado
+      tap(() => this.contatoModificadoSource.next())
+    );
   }
 }

@@ -1,0 +1,32 @@
+<div class="dashboard-container" *ngIf="estatisticas$ | async as stats; else loading">
+  
+  <header class="dashboard-header">
+    <h2>Estatísticas em Tempo Real <span class="live-indicator"></span></h2>
+    <p>Monitoramento ativo via Mensageria (Kafka)</p>
+  </header>
+
+  <div class="cards-grid">
+    <div class="stat-card total-card">
+      <div class="card-icon">👥</div>
+      <div class="card-content">
+        <h3>Total de Contatos</h3>
+        <p class="big-number">{{ stats.totalContatos }}</p>
+      </div>
+    </div>
+
+    <div class="stat-card domain-card" *ngFor="let dominio of obterDominios(stats.porDominio)">
+      <div class="card-icon">📧</div>
+      <div class="card-content">
+        <h3>&#64;{{ dominio }}</h3>
+        <p class="big-number">{{ stats.porDominio[dominio] }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #loading>
+  <div class="loading-state">
+    <div class="spinner"></div>
+    <p>Conectando ao Microsserviço de Estatísticas...</p>
+  </div>
+</ng-template>
