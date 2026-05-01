@@ -13,7 +13,7 @@ export interface EstatisticaResponse {
   providedIn: 'root'
 })
 export class DashboardService {
-  private apiUrl = 'http://localhost:8082/api/estatisticas';
+  private apiUrl = 'http://3.86.103.10:8082/api/estatisticas';
 
   constructor(private http: HttpClient) { }
 
