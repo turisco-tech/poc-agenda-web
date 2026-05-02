@@ -1,0 +1,126 @@
+name: Pipeline Web Angular
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  # ==========================================
+  # ESTÁGIO 1: Integração Contínua e Qualidade
+  # ==========================================
+  integration-and-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Instalar Dependências
+        run: npm install
+
+      - name: Rodar Testes
+        run: npm run test -- --watch=false --browsers=ChromeHeadless
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.projectKey=turisco-tech_poc-agenda-web
+            -Dsonar.organization=turisco-tech
+            -Dsonar.sources=src
+            -Dsonar.tests=src
+            -Dsonar.test.inclusions=**/*.spec.ts
+            -Dsonar.exclusions=**/node_modules/**,**/*.spec.ts
+
+  # ==========================================
+  # ESTÁGIO 2: Geração e Entrega da Imagem
+  # ==========================================
+  delivery-and-container:
+    needs: integration-and-quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar Credenciais AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login no Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # O pulo do gato do frontend: injeção de variável antes de buildar a imagem
+      - name: Injetar IP da EC2 no Angular
+        env:
+          API_URL: ${{ secrets.API_URL }}
+        run: |
+          echo "Injetando a URL da API no environment de produção..."
+          sed -i "s|API_URL|$API_URL|g" src/environments/environment.prod.ts
+
+      - name: Build, Tag, e Push da Imagem Docker
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: poc-agenda-web
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+      - name: Tratamento de Erros e Logs Críticos
+        if: failure()
+        run: |
+          echo "::error::Falha detectada na esteira do Web! Coletando logs..."
+          docker system df
+          docker ps -a
+
+  # ==========================================
+  # ESTÁGIO 3: Deploy na AWS ECS
+  # ==========================================
+  deploy-to-aws:
+    needs: delivery-and-container
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código (para ler o task-definition.json)
+        uses: actions/checkout@v4
+
+      - name: Configurar Credenciais AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login no Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Preencher o novo ID da imagem na Task Definition
+        id: render-task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: .aws/task-definition.json
+          container-name: web-container
+          image: ${{ steps.login-ecr.outputs.registry }}/poc-agenda-web:${{ github.sha }}
+
+      - name: Deploy da nova Task Definition Web no Amazon ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.render-task-def.outputs.task-definition }}
+          service: poc-agenda-web-service
+          cluster: poc-agenda-cluster
+          wait-for-service-stability: true
