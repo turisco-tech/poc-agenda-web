@@ -10,7 +10,7 @@ import { Contato } from '../models/contato.model';
 export class ContatoService {
   
   // URL da API. Se for testar contra a nuvem, troque o localhost pelo IP da AWS
-  private apiUrl = 'http://3.83.232.85:8080/api/contatos'; 
+  private apiUrl = 'http://3.92.227.193:8080/api/contatos'; 
 
   // 1. Criamos o "rádio comunicador" invisível
   private contatoModificadoSource = new Subject<void>();
