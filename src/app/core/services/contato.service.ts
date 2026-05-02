@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { Contato } from '../models/contato.model';
+import { environment } from '../../../environments/environment.prod';
 
 @Injectable({
   providedIn: 'root' // Garante que existe apenas uma instância desse serviço rodando (Singleton)
@@ -10,7 +11,7 @@ import { Contato } from '../models/contato.model';
 export class ContatoService {
   
   // URL da API. Se for testar contra a nuvem, troque o localhost pelo IP da AWS
-  private apiUrl = 'http://3.92.227.193:8080/api/contatos'; 
+  private apiUrl = `${environment.apiUrl}:8080/api/contatos`;
 
   // 1. Criamos o "rádio comunicador" invisível
   private contatoModificadoSource = new Subject<void>();

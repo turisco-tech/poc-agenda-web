@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, timer } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import { environment } from '../../../environments/environment.prod';
 
 // Interface espelhando o nosso Record do Java
 export interface EstatisticaResponse {
@@ -13,7 +14,7 @@ export interface EstatisticaResponse {
   providedIn: 'root'
 })
 export class DashboardService {
-  private apiUrl = 'http://3.92.227.193:8082/api/estatisticas';
+  private apiUrl = `${environment.apiUrl}:8082/api/estatisticas`;
 
   constructor(private http: HttpClient) { }
 
