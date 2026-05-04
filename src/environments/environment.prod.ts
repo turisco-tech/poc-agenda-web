@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'API_URL' // <-- Este é o placeholder que será substituído na esteira
+  apiUrl: 'http://API_URL' // <-- A nossa isca para o sed!
 };
