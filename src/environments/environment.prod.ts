@@ -1,4 +1,4 @@
 export const environment = {
-  production: false,
-  apiUrl: 'http://localhost' // <-- Apontando direto para a sua API local
+  production: true,
+  apiUrl: 'API_URL' // <-- Este é o placeholder que será substituído na esteira
 };
