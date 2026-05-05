@@ -70,6 +70,8 @@ jobs:
         run: |
           echo "Injetando a URL da API no environment de produção..."
           sed -i "s|API_URL|$API_URL|g" src/environments/environment.prod.ts
+          echo "Sobrescrevendo o environment local para forçar o build correto no Docker..."
+          cp src/environments/environment.prod.ts src/environments/environment.ts
 
       - name: Build, Tag, e Push da Imagem Docker
         env:
