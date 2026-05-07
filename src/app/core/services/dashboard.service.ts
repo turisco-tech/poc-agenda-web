@@ -14,7 +14,7 @@ export interface EstatisticaResponse {
   providedIn: 'root'
 })
 export class DashboardService {
-  private apiUrl = `${environment.apiUrl}:8082/api/estatisticas`;
+  private apiUrl = `${environment.apiUrl}/api/estatisticas`;
 
   constructor(private http: HttpClient) { }
 
