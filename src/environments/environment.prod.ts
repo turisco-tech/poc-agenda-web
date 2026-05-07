@@ -1,4 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://API_URL' // <-- A nossa isca para o sed!
+  apiPrincipalUrl: 'API_URL', // A esteira vai injetar https://agenda.turisco.com.br
+  apiDashboardUrl: 'API_URL'  // O mesmo domínio resolve as duas APIs via ALB!
 };

@@ -11,7 +11,7 @@ import { environment } from '../../../environments/environment';
 export class ContatoService {
   
   // URL da API. Se for testar contra a nuvem, troque o localhost pelo IP da AWS
-  private apiUrl = `${environment.apiUrl}/api/contatos`;
+  private apiUrl = `${environment.apiPrincipalUrl}/api/contatos`;
 
   // 1. Criamos o "rádio comunicador" invisível
   private contatoModificadoSource = new Subject<void>();

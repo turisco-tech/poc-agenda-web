@@ -1,4 +1,5 @@
 export const environment = {
   production: false,
-  apiUrl: 'https://localhost' // <-- Apenas o host base!
+  apiPrincipalUrl: 'http://localhost:8080',
+  apiDashboardUrl: 'http://localhost:8082'
 };
