@@ -1,4 +1,4 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost' // <-- Apenas o host base!
+  apiUrl: 'https://localhost' // <-- Apenas o host base!
 };
